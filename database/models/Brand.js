@@ -1,4 +1,9 @@
-
+/** 
+@param {import('sequelize').Sequelize} sequelize
+@param {import('sequelize/types').DataType} dataTypes
+@returns 
+Etiquetas de documentacion. No afectan en nada si son removidas.
+*/
 module.exports = (sequelize, DataTypes)=>{
     const Brand =  sequelize.define("Brand",{
         id : {

@@ -1,4 +1,9 @@
-
+/** 
+@param {import('sequelize').Sequelize} sequelize
+@param {import('sequelize/types').DataType} dataTypes
+@returns 
+Etiquetas de documentacion. No afectan en nada si son removidas.
+*/
 module.exports = (sequelize,DataTypes)=>{
     const Product = sequelize.define("Product",{
         id : {
@@ -26,7 +31,7 @@ module.exports = (sequelize,DataTypes)=>{
             type : DataTypes.INTEGER,
             allowNull : false,
         },
-        categoty_id : {
+        category_id : {
             type : DataTypes.INTEGER,
             allowNull : false,
         }
@@ -39,7 +44,7 @@ module.exports = (sequelize,DataTypes)=>{
     Product.associate = function(models){
         Product.belongsTo(models.Category,{
             as : "category",
-            foreignKey :"categoty_id",
+            foreignKey :"category_id",
         }),
         Product.belongsTo(models.Brand,{
             as : "brand",

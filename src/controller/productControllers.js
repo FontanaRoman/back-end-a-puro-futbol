@@ -1,6 +1,5 @@
-const db = require("../../database/models")
-
-module.exports = {
+const db = require("../../database/models");
+const productControllers= {
     // all products
     allProducts : (req,res)=>{
         db.Product.findAll()
@@ -13,5 +12,8 @@ module.exports = {
                     }
                 )
             })
+        
     }
 }
+
+module.exports = productControllers;
