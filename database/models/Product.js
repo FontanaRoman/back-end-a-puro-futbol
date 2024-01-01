@@ -15,14 +15,6 @@ module.exports = (sequelize,DataTypes)=>{
             type : DataTypes.STRING,
             allowNull : false,
         },
-        waist :{
-            type : DataTypes.INTEGER,
-            allowNull : false,
-        },
-        colors : {
-            type : DataTypes.INTEGER,
-            allowNull : false,
-        },
         state : {
             type : DataTypes.INTEGER,
             allowNull : false,
@@ -33,6 +25,18 @@ module.exports = (sequelize,DataTypes)=>{
         },
         category_id : {
             type : DataTypes.INTEGER,
+            allowNull : false,
+        },
+        image : {
+            type : DataTypes.STRING,
+            allowNull : false,
+        },
+        description : {
+            type : DataTypes.STRING,
+            allowNull : false,
+        },
+        image : {
+            type : DataTypes.STRING,
             allowNull : false,
         }
     },
