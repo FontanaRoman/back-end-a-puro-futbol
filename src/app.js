@@ -4,13 +4,9 @@ const session = require("express-session");
 const cookies = require("cookie-parser");
 const methodOverride = require("method-override");
 const cors = require("cors");
-const productRoute = require("./routes/product.Routes");
 
 
 const app = express();
-
-// setting
-app.set("view engine", "ejs");
 
 let corsOptions = {
     origin: "*"
@@ -32,7 +28,8 @@ app.use(methodOverride("_method"));
 app.use(express.urlencoded({extended : false}));
 app.use(express.json());
 
-app.use("/", productRoute);
+// aplicar middleware de rutas
+
 
 const port = 3000;
 
