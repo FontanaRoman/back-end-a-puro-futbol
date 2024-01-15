@@ -11,7 +11,7 @@ const configureMulter = (uploadDestination) => {
             cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
         }
     });
-    const upload = multer.diskStorage({ storage: storage });
+    const upload = multer({ storage: storage });
     return upload;
 };
 

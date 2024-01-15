@@ -5,6 +5,7 @@ const cookies = require("cookie-parser");
 const methodOverride = require("method-override");
 const cors = require("cors");
 
+const userRoutes = require("./routes/user.Routes");
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.use(express.urlencoded({extended : false}));
 app.use(express.json());
 
 // aplicar middleware de rutas
-
+app.use("/user",userRoutes);
 
 const port = 3000;
 
