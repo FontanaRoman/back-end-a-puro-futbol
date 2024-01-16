@@ -5,6 +5,19 @@ const db = require("../../database/models");
 const user = {
     register: async (req, res) => {
         try {
+
+            // Validar los campos del formulario
+            const resultValidation = validationResult(req);
+
+            if (!resultValidation.isEmpty()) {
+                return res.status(400).json({
+                    status: 400,
+                    errors: resultValidation.mapped(),
+                    oldData: req.body,
+                    msg: "Errores en el formulario",
+                });
+            }
+
             // Verificar si el usuario ya está registrado
             const existingUser = await db.Users.findOne({
                 where: {
@@ -15,21 +28,13 @@ const user = {
             if (existingUser) {
                 return res.status(400).json({
                     status: 400,
-                    msg: "Este correo electrónico ya está registrado",
+                    errors: {
+                        email: {
+                            msg: "Este correo ya está registrado",
+                        },
+                    },
                 });
-            }
-
-            // Validar los campos del formulario
-            const resultValidation = validationResult(req);
-
-            if (!resultValidation.isEmpty()) {
-                return res.status(400).json({
-                    status: 400,
-                    data: resultValidation.mapped(),
-                    oldData: req.body,
-                    msg: "Errores en el formulario",
-                });
-            }
+            }            
 
             // Configurar la imagen predeterminada
             let image = "default.jpg";
