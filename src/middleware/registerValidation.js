@@ -11,7 +11,7 @@ const validationRegister = [
         .withMessage("Tienes que ingresar un email")
         .isEmail()
         .withMessage("Tienes que ingresar un email valido")
-        .isLength({ min: 3, max: 30 })
+        .isLength({ min: 15, max: 30 })
         .withMessage('El email debe tener entre 15 y 30 caracteres'),
     body("phone")
         .notEmpty()
@@ -33,18 +33,18 @@ const validationRegister = [
             // Verificar que sea una imagen (puedes ajustar esto según tus necesidades)
             if (!image.mimetype.startsWith('image/')) {
                 throw new Error('El archivo debe ser una imagen');
-            }
+            };
 
             // Verificar el tamaño del archivo (ejemplo: máximo 5MB)
             const maxSize = 3 * 1024 * 1024; // 3MB en bytes
             if (image.size > maxSize) {
                 throw new Error('La imagen no debe superar los 3MB');
-            }
+            };
         }
 
         // Si no se proporciona una imagen, no hay errores de validación
         return true;
     })
-]
+];
 
 module.exports = validationRegister;

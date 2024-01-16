@@ -69,6 +69,75 @@ const user = {
             });
         }
     },
+    login : async (req,res)=>{
+        try{
+            const resultValidation = validationResult(req);
+
+            if(!resultValidation.isEmpty){
+                return res.status(400).json({
+                    status : 400,
+                    error : resultValidation.mapped(),
+                    oldData : req.body,
+                    msg : "Errores de formulario",
+                });
+            };
+
+            const existingUser = await db.Users.findOne({
+                where : {
+                    email : req.body.email,
+                },
+            })
+
+            if(existingUser){
+                return res.status(400).json({
+                    status: 400,
+                    errors: {
+                        email: {
+                            msg: "Este email ya esta registrado",
+                        },
+                    },
+                    msg: "Correo ya registrado",
+                });
+            }
+
+            db.Users.findOne({
+                where : {email : req.body.email},
+            })
+                .then((user)=>{
+                    let userToLogin = user;
+
+                    if(userToLogin){
+                        const isOkThePassword = bcrypt.compareSync(req.body.password, userToLogin.password);
+                        if((userToLogin.email === req.body.email) && (isOkThePassword == true)){
+                            delete userToLogin.password;
+                            req.session.userLogged = userToLogin;
+                            if(req.body.recuerdame != undefined){
+                                res.cookie("recordame", userToLogin.email, { maxAge: 60000 });
+                            };
+
+                            return res.status(200).json({
+                                status : 200,
+                                data : req.session.userLogged,
+                                msg : "Inicio de secion completo",
+                            });
+
+                        };
+                    }else{
+                        return res.status(400).json({
+                            status : 400,
+                            error : "Error al iniciar secion"
+                        });
+                    };
+                });
+        }
+        catch (error){
+            return res.status(500).json({
+                status : 500,
+                error : error,
+                msg: "Error interno del servidor al intentar iniciar secion",
+            });
+        };
+    },
 };
 
 module.exports = user;
