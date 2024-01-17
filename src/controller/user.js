@@ -82,24 +82,6 @@ const user = {
                 });
             };
 
-            const existingUser = await db.Users.findOne({
-                where : {
-                    email : req.body.email,
-                },
-            })
-
-            if(existingUser){
-                return res.status(400).json({
-                    status: 400,
-                    errors: {
-                        email: {
-                            msg: "Este email ya esta registrado",
-                        },
-                    },
-                    msg: "Correo ya registrado",
-                });
-            }
-
             db.Users.findOne({
                 where : {email : req.body.email},
             })
@@ -114,6 +96,8 @@ const user = {
                             if(req.body.recuerdame != undefined){
                                 res.cookie("recordame", userToLogin.email, { maxAge: 60000 });
                             };
+
+                            console.log(req.session.userLogged)
 
                             return res.status(200).json({
                                 status : 200,

@@ -11,15 +11,13 @@ const validationRegister = [
         .withMessage("Tienes que ingresar un email")
         .isEmail()
         .withMessage("Tienes que ingresar un email valido")
-        .isLength({ min: 15, max: 30 })
+        .isLength({ min: 8, max: 30 })
         .withMessage('El email debe tener entre 15 y 30 caracteres'),
     body("phone")
         .notEmpty()
         .withMessage("Tienes que ingresar un telefono")
         .isNumeric()
-        .whitelist("Solamente se permiten caracteres numericos")
-        .isLength({ min: 7, max: 30 })
-        .withMessage('El telefono debe incluir codigo de area'),
+        .whitelist("Solamente se permiten caracteres numericos"),
     body("password")
         .notEmpty()
         .withMessage("Tienes que ingresar una contraseña")
