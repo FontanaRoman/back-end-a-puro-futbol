@@ -7,8 +7,10 @@ const userController = require("../controller/user");
 
 const userUpload = configureMulter('users');
 
-router.post("/register", userUpload.single("image"), validationRegister, userController.register);
+router.post("/register", validationRegister, userController.register);
 
 router.post("/login", validationLogin, userController.login);
+
+router.post("/destroy", userController.destroy);
 
 module.exports = router;

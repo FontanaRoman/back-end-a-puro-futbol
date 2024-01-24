@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const db = require("../../database/models");
+const { where } = require("sequelize");
 
 const user = {
     register: async (req, res) => {
@@ -34,7 +35,7 @@ const user = {
                         },
                     },
                 });
-            }            
+            }
 
             // Configurar la imagen predeterminada
             let image = "default.jpg";
@@ -54,11 +55,10 @@ const user = {
                 phone: req.body.phone,
             };
 
-            const createdUser = await db.Users.create(newUser);
+            await db.Users.create(newUser);
 
             res.status(200).json({
                 status: 200,
-                data: createdUser,
                 msg: "Registro creado correctamente",
             });
         } catch (error) {
@@ -69,56 +69,112 @@ const user = {
             });
         }
     },
-    login : async (req,res)=>{
-        try{
+    edit: async (req, res) => {
+
+        try {
             const resultValidation = validationResult(req);
 
-            if(!resultValidation.isEmpty){
+            if (!resultValidation.isEmpty()) {
                 return res.status(400).json({
-                    status : 400,
-                    error : resultValidation.mapped(),
-                    oldData : req.body,
-                    msg : "Errores de formulario",
+                    status: 400,
+                    errors: resultValidation.mapped(),
+                    oldData: req.body,
+                    msg: "errores del formulario"
+                });
+            };
+
+            let image = req.body.image;
+
+            if(req.file && req.file.filename){
+                image = req.file.filename;
+            };
+
+            const userEdit = {
+                name: req.body.name,
+                email: req.body.email,
+                image: image,
+                phone: req.body.phone,
+            }         
+            
+            const userToEdit = {where : {id : req.session.userLogged}};
+
+            await db.Users.update(userEdit, userToEdit)
+
+            res.status(200).json({
+                status : 200,
+                msg : "Edicion de perfil completa"
+            })
+        } catch (error) {
+            res.status(500).json({
+                status: 500,
+                error: error,
+                msg: "error al editar perfil"
+            })
+        }
+
+
+    },
+    login: async (req, res) => {
+        try {
+            const resultValidation = validationResult(req);
+
+            if (!resultValidation.isEmpty) {
+                return res.status(400).json({
+                    status: 400,
+                    error: resultValidation.mapped(),
+                    oldData: req.body,
+                    msg: "Errores de formulario",
                 });
             };
 
             db.Users.findOne({
-                where : {email : req.body.email},
+                where: { email: req.body.email },
             })
-                .then((user)=>{
+                .then((user) => {
                     let userToLogin = user;
 
-                    if(userToLogin){
+                    if (userToLogin) {
                         const isOkThePassword = bcrypt.compareSync(req.body.password, userToLogin.password);
-                        if((userToLogin.email === req.body.email) && (isOkThePassword == true)){
+                        if ((userToLogin.email === req.body.email) && (isOkThePassword == true)) {
                             delete userToLogin.password;
                             req.session.userLogged = userToLogin;
-                            if(req.body.recuerdame != undefined){
+                            if (req.body.recuerdame != undefined) {
                                 res.cookie("recordame", userToLogin.email, { maxAge: 60000 });
                             };
 
                             console.log(req.session.userLogged)
 
                             return res.status(200).json({
-                                status : 200,
-                                data : req.session.userLogged,
-                                msg : "Inicio de secion completo",
+                                status: 200,
+                                data: req.session.userLogged,
+                                msg: "Inicio de secion completo",
                             });
 
                         };
-                    }else{
+                    } else {
                         return res.status(400).json({
-                            status : 400,
-                            error : "Error al iniciar secion"
+                            status: 400,
+                            error: "Error al iniciar secion"
                         });
                     };
                 });
         }
-        catch (error){
+        catch (error) {
             return res.status(500).json({
-                status : 500,
-                error : error,
+                status: 500,
+                error: error,
                 msg: "Error interno del servidor al intentar iniciar secion",
+            });
+        };
+    },
+    destroy: async (req, res) => {
+        try {
+            req.session.destroy()
+        } catch (error) {
+            res.status(500).json({
+                status: 500,
+                error: error,
+                msg: "error al cerrar sesion",
             });
         };
     },

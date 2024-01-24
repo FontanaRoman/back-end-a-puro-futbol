@@ -4,6 +4,7 @@ const session = require("express-session");
 const cookies = require("cookie-parser");
 const methodOverride = require("method-override");
 const cors = require("cors");
+const path = require('path');
 
 const userRoutes = require("./routes/user.Routes");
 
@@ -22,7 +23,7 @@ app.use(session(
     }
 ));
 app.use(cookies());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));
 
 app.use(methodOverride("_method"));
