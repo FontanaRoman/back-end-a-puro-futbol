@@ -1,6 +1,6 @@
 const { body } = require("express-validator");
 
-const validationRegister = [
+const editValidationUser = [
     body("name")
         .notEmpty()
         .withMessage("Tienes que ingresar un nombre")
@@ -18,11 +18,6 @@ const validationRegister = [
         .withMessage("Tienes que ingresar un telefono")
         .isNumeric()
         .whitelist("Solamente se permiten caracteres numericos"),
-    body("password")
-        .notEmpty()
-        .withMessage("Tienes que ingresar una contraseña")
-        .isLength({ min: 5 })
-        .withMessage("La contraseña debe tener minimo 5 caracteres"),
     body('image').custom((value, { req }) => {
         // Verificar si el campo image está presente en la solicitud
         if (req.files && req.files.image) {
@@ -45,4 +40,4 @@ const validationRegister = [
     })
 ];
 
-module.exports = validationRegister;
+module.exports = editValidationUser;
