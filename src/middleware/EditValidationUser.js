@@ -15,9 +15,7 @@ const editValidationUser = [
         .withMessage('El email debe tener entre 15 y 30 caracteres'),
     body("phone")
         .notEmpty()
-        .withMessage("Tienes que ingresar un telefono")
-        .isNumeric()
-        .whitelist("Solamente se permiten caracteres numericos"),
+        .withMessage("Tienes que ingresar un telefono"),
     body('image').custom((value, { req }) => {
         // Verificar si el campo image está presente en la solicitud
         if (req.files && req.files.image) {

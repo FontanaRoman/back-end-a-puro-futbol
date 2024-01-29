@@ -10,11 +10,6 @@ const userRoutes = require("./routes/user.Routes");
 
 const app = express();
 
-let corsOptions = {
-    origin: "*"
-};
-
-// middlewares
 app.use(session(
     {
         secret : "Shhhh, esto es secreto",
@@ -22,6 +17,11 @@ app.use(session(
         saveUninitialized : false,
     }
 ));
+
+let corsOptions = {
+    origin: "*"
+};
+
 app.use(cookies());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));

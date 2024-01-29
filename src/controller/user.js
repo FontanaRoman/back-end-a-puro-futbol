@@ -69,51 +69,6 @@ const user = {
             });
         }
     },
-    edit: async (req, res) => {
-
-        try {
-            const resultValidation = validationResult(req);
-
-            if (!resultValidation.isEmpty()) {
-                return res.status(400).json({
-                    status: 400,
-                    errors: resultValidation.mapped(),
-                    oldData: req.body,
-                    msg: "errores del formulario"
-                });
-            };
-
-            let image = req.session.UserLogged ? req.session.UserLogged.image : "";
-
-            if (req.file && req.file.filename) {
-                image = req.file.filename;
-            };
-
-
-            await db.Users.update(
-                {
-                    name: req.body.name,
-                    email: req.body.email,
-                    image: image,
-                    phone: req.body.phone,
-                },
-                {
-                    where: { id: req.session.UserLogged.id }
-                }
-            )
-
-            res.status(200).json({
-                status: 200,
-                msg: "Edicion de perfil completa"
-            })
-        } catch (error) {
-            res.status(500).json({
-                status: 500,
-                error: error,
-                msg: "error al editar perfil"
-            })
-        }
-    },
     login: async (req, res) => {
         try {
             const resultValidation = validationResult(req);
@@ -137,16 +92,12 @@ const user = {
                         if ((userToLogin.email === req.body.email) && (isOkThePassword == true)) {
                             delete userToLogin.password;
                             req.session.userLogged = userToLogin;
-                            if (req.body.recuerdame != undefined) {
-                                res.cookie("recordame", userToLogin.email, { maxAge: 60000 });
-                            };
-
+                                console.log(req.session.userLogged.name);                 
                             return res.status(200).json({
                                 status: 200,
                                 data: req.session.userLogged,
                                 msg: "Inicio de secion completo",
                             });
-
                         };
                     } else {
                         return res.status(400).json({
@@ -164,6 +115,52 @@ const user = {
             });
         };
     },
+    edit: async (req, res) => {
+        console.log(req.session.userLogged.name, "edit");
+
+    try {
+        const resultValidation = validationResult(req);
+
+        if (!resultValidation.isEmpty()) {
+            return res.status(400).json({
+                status: 400,
+                errors: resultValidation.mapped(),
+                oldData: req.body,
+                msg: "errores del formulario"
+            });
+        };
+
+        let image = req.session.userLogged ? req.session.userLogged.image : "";
+
+        if (req.file && req.file.filename) {
+            image = req.file.filename;
+        };
+
+        await db.Users.update(
+            {
+                name: req.body.name,
+                email: req.body.email,
+                image: image,
+                phone: req.body.phone,
+            },
+            {
+                where: { id: req.session.userLogged.id }
+            }
+        )
+
+
+        res.status(200).json({
+            status: 200,
+            msg: "Edicion de perfil completa"
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            error: error,
+            msg: "error al editar perfil"
+        })
+    }
+},
     destroy: async (req, res) => {
         try {
             req.session.destroy()

@@ -2,9 +2,12 @@ const multer = require("multer");
 const path = require("path");
 
 const configureMulter = (uploadDestination) => {
+
+  const absoluteRut = `../public/${uploadDestination}`;
+
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, path.join(__dirname, `../public/img/${uploadDestination}`));
+            cb(null, path.join(__dirname, absoluteRut));
         },
         filename: (req, file, cb) => {
             const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
