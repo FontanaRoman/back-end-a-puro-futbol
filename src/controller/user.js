@@ -1,15 +1,16 @@
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const db = require("../../database/models");
-const { where } = require("sequelize");
+const jwt = require("jsonwebtoken");
 
 const user = {
     register: async (req, res) => {
         try {
 
-            // Validar los campos del formulario
+            // Errors
             const resultValidation = validationResult(req);
 
+            //error checking
             if (!resultValidation.isEmpty()) {
                 return res.status(400).json({
                     status: 400,
@@ -17,15 +18,14 @@ const user = {
                     oldData: req.body,
                     msg: "Errores en el formulario",
                 });
-            }
+            };
 
-            // Verificar si el usuario ya está registrado
+            // checking if the user is registered
             const existingUser = await db.Users.findOne({
                 where: {
                     email: req.body.email,
                 },
             });
-
             if (existingUser) {
                 return res.status(400).json({
                     status: 400,
@@ -35,16 +35,17 @@ const user = {
                         },
                     },
                 });
-            }
+            };
 
-            // Configurar la imagen predeterminada
+
+            // set default image
             let image = "default.jpg";
 
             if (req.file && req.file.filename) {
                 image = req.file.filename;
             }
 
-            // Crear un nuevo usuario
+            // Create new user
             const newUser = {
                 name: req.body.name,
                 email: req.body.email,
@@ -62,7 +63,6 @@ const user = {
                 msg: "Registro creado correctamente",
             });
         } catch (error) {
-            console.error('Error al crear un nuevo usuario:', error);
             res.status(500).json({
                 status: 500,
                 error: 'Error interno del servidor al crear un nuevo usuario',
@@ -71,8 +71,9 @@ const user = {
     },
     login: async (req, res) => {
         try {
+            // Errors
             const resultValidation = validationResult(req);
-
+            //error checking
             if (!resultValidation.isEmpty()) {
                 return res.status(400).json({
                     status: 400,
@@ -80,7 +81,7 @@ const user = {
                     msg: "Errores de formulario",
                 });
             };
-
+            // user search
             db.Users.findOne({
                 where: { email: req.body.email },
             })
@@ -90,19 +91,23 @@ const user = {
                     if (userToLogin) {
                         const isOkThePassword = bcrypt.compareSync(req.body.password, userToLogin.password);
                         if ((userToLogin.email === req.body.email) && (isOkThePassword == true)) {
-                            delete userToLogin.password;
-                            req.session.userLogged = userToLogin;
-                                console.log(req.session.userLogged.name);                 
+                                  
+                            const userForToken = {
+                                ...user
+                            }                            
+
+                            const token = jwt.sign(userForToken, "the-secret-in-code")
+
                             return res.status(200).json({
                                 status: 200,
-                                data: req.session.userLogged,
+                                data: token,
                                 msg: "Inicio de secion completo",
                             });
                         };
                     } else {
-                        return res.status(400).json({
-                            status: 400,
-                            error: "Error al iniciar secion"
+                        return res.status(401).json({
+                            status: 401,
+                            error: "Credenciales invalidas"
                         });
                     };
                 });
@@ -116,9 +121,10 @@ const user = {
         };
     },
     edit: async (req, res) => {
-        console.log(req.session.userLogged.name, "edit");
-
     try {
+
+        const userEdit = req.session.userLogged;
+
         const resultValidation = validationResult(req);
 
         if (!resultValidation.isEmpty()) {
@@ -130,7 +136,7 @@ const user = {
             });
         };
 
-        let image = req.session.userLogged ? req.session.userLogged.image : "";
+        let image = userEdit ? userEdit.image : "";
 
         if (req.file && req.file.filename) {
             image = req.file.filename;
@@ -144,7 +150,7 @@ const user = {
                 phone: req.body.phone,
             },
             {
-                where: { id: req.session.userLogged.id }
+                where: { id: userEdit.id }
             }
         )
 
@@ -154,10 +160,13 @@ const user = {
             msg: "Edicion de perfil completa"
         })
     } catch (error) {
+
+        console.log(userEdit)
+
         res.status(500).json({
             status: 500,
             error: error,
-            msg: "error al editar perfil"
+            msg: "error al editar perfil",
         })
     }
 },
