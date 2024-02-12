@@ -216,7 +216,7 @@ const user = {
             const productsIDs = userFavorites.map(favorites => favorites.product_id);
 
             const products = await db.Products.findAll({
-                where: { id: productIDs }
+                where: { id: productsIDs }
             });
 
             return res.status(200).json({
