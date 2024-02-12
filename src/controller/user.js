@@ -91,10 +91,10 @@ const user = {
                     if (userToLogin) {
                         const isOkThePassword = bcrypt.compareSync(req.body.password, userToLogin.password);
                         if ((userToLogin.email === req.body.email) && (isOkThePassword == true)) {
-                                  
+
                             const userForToken = {
                                 ...user
-                            }                            
+                            }
 
                             const token = jwt.sign(userForToken, "the-secret-in-code")
 
@@ -121,55 +121,55 @@ const user = {
         };
     },
     edit: async (req, res) => {
-    try {
+        try {
 
-        const userEdit = req.session.userLogged;
+            const userEdit = req.session.userLogged;
 
-        const resultValidation = validationResult(req);
+            const resultValidation = validationResult(req);
 
-        if (!resultValidation.isEmpty()) {
-            return res.status(400).json({
-                status: 400,
-                errors: resultValidation.mapped(),
-                oldData: req.body,
-                msg: "errores del formulario"
-            });
-        };
+            if (!resultValidation.isEmpty()) {
+                return res.status(400).json({
+                    status: 400,
+                    errors: resultValidation.mapped(),
+                    oldData: req.body,
+                    msg: "errores del formulario"
+                });
+            };
 
-        let image = userEdit ? userEdit.image : "";
+            let image = userEdit ? userEdit.image : "";
 
-        if (req.file && req.file.filename) {
-            image = req.file.filename;
-        };
+            if (req.file && req.file.filename) {
+                image = req.file.filename;
+            };
 
-        await db.Users.update(
-            {
-                name: req.body.name,
-                email: req.body.email,
-                image: image,
-                phone: req.body.phone,
-            },
-            {
-                where: { id: userEdit.id }
-            }
-        )
+            await db.Users.update(
+                {
+                    name: req.body.name,
+                    email: req.body.email,
+                    image: image,
+                    phone: req.body.phone,
+                },
+                {
+                    where: { id: userEdit.id }
+                }
+            )
 
 
-        res.status(200).json({
-            status: 200,
-            msg: "Edicion de perfil completa"
-        })
-    } catch (error) {
+            res.status(200).json({
+                status: 200,
+                msg: "Edicion de perfil completa"
+            })
+        } catch (error) {
 
-        console.log(userEdit)
+            console.log(userEdit)
 
-        res.status(500).json({
-            status: 500,
-            error: error,
-            msg: "error al editar perfil",
-        })
-    }
-},
+            res.status(500).json({
+                status: 500,
+                error: error,
+                msg: "error al editar perfil",
+            })
+        }
+    },
     destroy: async (req, res) => {
         try {
             req.session.destroy()
@@ -181,6 +181,57 @@ const user = {
             });
         };
     },
+    userOrders: async (req, res) => {
+        try {
+            const userID = req.params.id;
+
+            const userOrders = await db.Orders.findAll({ where: { user_id: userID } });
+
+            const productIDs = userOrders.map(order => order.product_id);
+
+            const products = await db.Product.findAll({
+                where: {
+                    id: productIDs
+                }
+            });
+
+            return res.status(200).json({
+                status: 200,
+                products: products,
+                msg: "Exito en consular Ordenes"
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                msg: "Error al solicitar ordenes"
+            })
+        };
+    },
+    userFavorites: async (req, res) => {
+        try {
+            const userID = req.params.id;
+
+            const userFavorites = await db.Favorites.findAll({ where: { user_id: userID } });
+
+            const productsIDs = userFavorites.map(favorites => favorites.product_id);
+
+            const products = await db.Products.findAll({
+                where: { id: productIDs }
+            });
+
+            return res.status(200).json({
+                status: 200,
+                products: products,
+                msg: "Exito en consular Favoritos"
+            });
+
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                msg: "Error al solicitar ordenes"
+            })
+        };
+    }
 };
 
 module.exports = user;
