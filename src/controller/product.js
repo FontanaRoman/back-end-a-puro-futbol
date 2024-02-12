@@ -155,8 +155,70 @@ const productControllers = {
                 msg: `Error interno del servidor`
             });
         }
-    }
+    },
+    favoriteProduct: async (req, res) => {
+        try {
+            const productID = req.params.productId;
+            const userID = req.params.userId;
 
+            const user = await db.Users.findOne({ where: { id: userID } });
+            const product = await db.Product.findOne({ where: { id: productID } });
+
+            if (user && product) {
+                await db.Favorites.create({
+                    user_id: userID,
+                    product_id: productID,
+                });
+
+                return res.status(200).json({
+                    status: 200,
+                    msg: "Exito al guardar en favoritos",
+                });
+            } else {
+                return res.status(404).json({
+                    status: 404,
+                    msg: "Error al guardar producto: Usuario o producto no encontrado",
+                });
+            };
+
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                msg: `Error interno del servidor`
+            });
+        };
+    },
+    orders : async (req,res) => {
+        try {
+            const productID = req.params.productId;
+            const userID = req.params.userId;
+
+            const user = await db.Users.findOne({ where: { id: userID } });
+            const product = await db.Product.findOne({ where: { id: productID } });       
+            
+            if(user && product){
+                await db.Orders.create({
+                    user_id : userID,
+                    product_id : productID,
+                });
+
+                return res.status(200).json({
+                    status: 200,
+                    msg: "Orden creada exitosamente",
+                });
+            }else{
+                return res.status(404).json({
+                    status: 404,
+                    msg: "Error al guardar producto: Usuario o producto no encontrado",
+                });
+            };
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                msg: `Error interno del servidor`,
+            });
+        };
+    },
 }
 
 module.exports = productControllers;
