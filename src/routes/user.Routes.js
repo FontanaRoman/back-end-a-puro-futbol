@@ -11,7 +11,7 @@ router.post("/register", validationRegister, userController.register);
 
 router.post("/login", userController.login);
 
-router.put("/edit-data-user", userUpload.single("image"), editValidationUser, userController.edit)
+router.put("/edit-data-user/:id", userUpload.single("image"), editValidationUser, userController.edit)
 
 router.post("/destroy", userController.destroy);
 

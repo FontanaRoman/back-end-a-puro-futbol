@@ -122,26 +122,42 @@ const user = {
     },
     edit: async (req, res) => {
         try {
-
-            const userEdit = req.session.userLogged;
-
+            // Buscar el usuario por su ID
+            const user = await db.Users.findOne({where : {id : req.params.id}});
+    
+            // Verificar si el usuario existe
+            if (!user) {
+                console.log("Usuario no encontrado");
+                return res.status(404).json({
+                    status: 404,
+                    msg: "No se encontro al usuario"
+                });
+            }
+    
+            // Validar la entrada
             const resultValidation = validationResult(req);
-
+    
             if (!resultValidation.isEmpty()) {
+                console.log("Errores de validación:", resultValidation.array());
                 return res.status(400).json({
                     status: 400,
                     errors: resultValidation.mapped(),
                     oldData: req.body,
-                    msg: "errores del formulario"
+                    msg: "Errores del formulario"
                 });
-            };
-
-            let image = userEdit ? userEdit.image : "";
-
+            }
+    
+            // Establecer la imagen del usuario
+            let image = user ? user.image : "";
+    
+            console.log("Datos de la solicitud:", req.body);
+    
+            // Actualizar la imagen si se proporcionó un archivo en la solicitud
             if (req.file && req.file.filename) {
                 image = req.file.filename;
-            };
-
+            }
+    
+            // Actualizar los datos del usuario en la base de datos
             await db.Users.update(
                 {
                     name: req.body.name,
@@ -150,26 +166,35 @@ const user = {
                     phone: req.body.phone,
                 },
                 {
-                    where: { id: userEdit.id }
+                    where: { id: user.id }
                 }
-            )
+            );
+    
+            // Obtener el usuario actualizado después de la actualización
+            const userUpdate = await db.Users.findOne({where : {id : user.id}});
+    
+            // Generar un token JWT con los datos actualizados del usuario
 
+            const userForToken = userUpdate.dataValues;
 
-            res.status(200).json({
+            const token = jwt.sign(userForToken, "the-secret-in-code");
+
+            // Responder con el token y un mensaje de éxito
+            return res.status(200).json({
                 status: 200,
-                msg: "Edicion de perfil completa"
-            })
+                data: token,
+                msg: "Edición de perfil completa"
+            });
+
         } catch (error) {
-
-            console.log(userEdit)
-
-            res.status(500).json({
+            // Manejar cualquier error que ocurra durante el proceso
+            return res.status(500).json({
                 status: 500,
                 error: error,
-                msg: "error al editar perfil",
-            })
+                msg: "Error al editar perfil",
+            });
         }
-    },
+    },    
     destroy: async (req, res) => {
         try {
             req.session.destroy()
@@ -228,7 +253,7 @@ const user = {
         } catch (error) {
             return res.status(500).json({
                 status: 500,
-                msg: "Error al solicitar ordenes"
+                msg: "Error al solicitar favoritos"
             })
         };
     }

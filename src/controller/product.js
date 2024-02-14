@@ -188,7 +188,7 @@ const productControllers = {
             });
         };
     },
-    orders : async (req,res) => {
+    createOrders : async (req,res) => {
         try {
             const productID = req.params.productId;
             const userID = req.params.userId;
