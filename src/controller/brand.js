@@ -1,3 +1,4 @@
+const db = require("../../database/models")
 const brandControllers = {
 
     registerBrand: async (req,res) => {
@@ -22,11 +23,36 @@ const brandControllers = {
                 });
             }
         } catch (error) {
+            console.log("aca ocurre un error", error)
             return res.status(500).json({
                 status: 500,
                 msg: `Error interno del servidor`,
             });
         }
+    },
+    readBrand: async (req,res) => {
+        try {
+             let brand = await db.Brand.findAll();
+             brand = brand.map(brand => brand.dataValues);
+             if(brand){
+                return res.status(200).json({
+                    status: 200,
+                    data: brand,
+                    msg: "Exito al solicitar marcas",
+                }); 
+             }else{
+                return res.status(404).json({
+                    status: 404,
+                    msg: "No se an encontrado marcas o no estan registradas",
+                });
+             };
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                errors: error,
+                msg: "Error interno al solicitar marcas",
+            });
+        };
     }
 
 };

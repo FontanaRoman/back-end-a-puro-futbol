@@ -8,6 +8,8 @@ const path = require('path');
 
 const userRoutes = require("./routes/user.Routes");
 const productRoutes = require("./routes/product.Routes")
+const brandRoutes = require("./routes/brand.Routes");
+const categoryRoutes = require("./routes/category.Routes");
 const app = express();
 
 app.use(session(
@@ -34,6 +36,8 @@ app.use(express.json());
 // aplicar middleware de rutas
 app.use("/user",userRoutes);
 app.use("/product",productRoutes);
+app.use("/brand",brandRoutes);
+app.use("/category",categoryRoutes);
 
 const port = 3000;
 

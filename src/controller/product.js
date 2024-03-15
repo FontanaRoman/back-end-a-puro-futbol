@@ -5,8 +5,8 @@ const productControllers = {
 
     uploadProduct: async (req, res) => {
         try {
+            console.log("informacion del body",req.body)
             const resultValidation = validationResult(req);
-
             if (!resultValidation.isEmpty()) {
                 return res.status(500).json({
                     status: 500,
@@ -22,11 +22,13 @@ const productControllers = {
                 image = req.file.filename;
             };
 
+            const categoryParseInt = parseInt(req.body.category)
+
             const newProduct = {
                 name: req.body.name,
                 state: 1,
-                brand_id: req.body.brand,
-                category_id: req.body.category,
+                brand_id: req.body.brand_id,
+                category_id: req.body.category_id,
                 image: image,
                 description: req.body.description,
                 waist: req.body.waist,
@@ -200,6 +202,7 @@ const productControllers = {
                 await db.Orders.create({
                     user_id : userID,
                     product_id : productID,
+                    date : new Date(),
                 });
 
                 return res.status(200).json({

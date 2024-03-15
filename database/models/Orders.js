@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes)=>{
         product_id : {
             type : DataTypes.INTEGER,
             allowNull : false,
+        },
+        date : {
+            type : DataTypes.DATE,
+            allowNull : false,
         }
     },
     {
